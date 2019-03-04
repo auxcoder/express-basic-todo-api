@@ -6,14 +6,14 @@ Create a Sqlite DB for development
 
 ```sh
 $ sqlite3
-sqlite> create table <tableName>
+sqlite> create table test.db
 ```
 
 Install and run
 
 ```sh
-npm install
-npm start
+$ npm install
+$ npm start
 ```
 
 ---
