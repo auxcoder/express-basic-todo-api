@@ -3,9 +3,9 @@ const router = express.Router();
 const Todos = require('../../db/models/todos');
 // READ
 router.route('/').get((req, res) => {
-  Todos.fetchAll().then(function(data) {
-    res.json({ error: false, data: data });
-  });
+  Todos.fetchAll()
+    .then(data => res.json({ error: false, data: data }))
+    .catch(err => res.status(500).json({ error: [err.message], data: {} }));
 });
 // CREATE
 router.post('/', (req, res) => {
@@ -14,12 +14,8 @@ router.post('/', (req, res) => {
     completed: req.body.completed
   })
     .save()
-    .then(data => {
-      res.status(201).json({ error: false, data: data });
-    })
-    .catch(err => {
-      res.status(500).json({ error: true, data: { message: err.message } });
-    });
+    .then(data => res.status(201).json({ error: false, data: data }))
+    .catch(err => res.status(500).json({ error: [err.message], data: {} }));
 });
 // READ
 router.get('/:id([0-9]+)', (req, res) => {
@@ -33,9 +29,7 @@ router.get('/:id([0-9]+)', (req, res) => {
         res.json({ error: false, data: data });
       }
     })
-    .catch(err => {
-      res.status(500).json({ error: true, data: { message: err.message } });
-    });
+    .catch(err => res.status(500).json({ error: [err.message], data: {} }));
 });
 // UPDATE
 router.patch('/:id([0-9]+)', (req, res) => {
@@ -51,7 +45,7 @@ router.patch('/:id([0-9]+)', (req, res) => {
         })
         .then(() => res.json({ error: false, data: { message: 'Quote updated' } }));
     })
-    .catch(err => res.status(500).json({ error: true, data: { message: err.message } }));
+    .catch(err => res.status(500).json({ error: [err.message], data: {} }));
 });
 // DELETE
 router.delete('/:id([0-9]+)', (req, res) => {
@@ -59,7 +53,7 @@ router.delete('/:id([0-9]+)', (req, res) => {
   Todos.where('id', req.params.id)
     .destroy()
     .then(data => res.json({ error: false, data: data }))
-    .catch(err => res.status(500).json({ error: true, data: { message: err.message } }));
+    .catch(err => res.status(500).json({ error: [err.message], data: {} }));
 });
 
 module.exports = router;
