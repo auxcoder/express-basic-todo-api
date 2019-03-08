@@ -61,4 +61,5 @@ router.delete('/:id([0-9]+)', (req, res) => {
     .then(data => res.json({ error: false, data: data }))
     .catch(err => res.status(500).json({ error: true, data: { message: err.message } }));
 });
+
 module.exports = router;
