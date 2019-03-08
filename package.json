@@ -1,11 +1,12 @@
 {
-  "name": "express-basic-todo-api",
+  "name": "todo-api",
   "version": "1.0.0",
   "description": "A basic rest API, Knex, Bookshelf",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "server.spec.js"
+    "pm": "pm2 start server.js --watch",
+    "test": "mocha --watch ./**/*.test.js"
   },
   "author": "Auxcoder",
   "license": "ISC",
@@ -18,5 +19,9 @@
     "knex": "^0.16.3",
     "nodemon": "^1.18.10",
     "sqlite3": "^4.0.6"
+  },
+  "devDependencies": {
+    "mocha": "^6.0.2",
+    "supertest": "^3.4.2"
   }
 }
