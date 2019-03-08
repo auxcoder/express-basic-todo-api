@@ -1,6 +1,6 @@
 var express = require('express');
 const router = express.Router();
-const Todos = require('../models/todos');
+const Todos = require('../../db/models/todos');
 // READ
 router.route('/').get((req, res) => {
   Todos.fetchAll().then(function(data) {
@@ -58,7 +58,7 @@ router.delete('/:id([0-9]+)', (req, res) => {
   if (!req.params.id) console.error('quote ID is required');
   Todos.where('id', req.params.id)
     .destroy()
-    .then(model => res.json({ error: false, data: model }))
+    .then(data => res.json({ error: false, data: data }))
     .catch(err => res.status(500).json({ error: true, data: { message: err.message } }));
 });
 module.exports = router;

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon server.js",
     "pm": "pm2 start server.js --watch",
-    "test": "mocha --watch ./**/*.test.js"
+    "test": "mocha --watch ./routes/**/*.test.js",
+    "shell": "echo $0"
   },
   "author": "Auxcoder",
   "license": "ISC",
