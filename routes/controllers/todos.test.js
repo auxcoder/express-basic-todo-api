@@ -11,7 +11,7 @@ const todoObj = {
 };
 let testId;
 // #endregion
-// READ
+// READ all/paginate
 describe('GET /todos', () => {
   it('should get all todos records', done => {
     request
@@ -82,7 +82,7 @@ describe('PATCH /todos/<id>', () => {
       });
   });
 });
-
+// DELETE
 describe('DELETE /todos/<id>', () => {
   it('should remove a todo record', done => {
     request
