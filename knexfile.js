@@ -6,6 +6,9 @@ module.exports = {
     connection: {
       filename: 'test.db'
     },
+    migrations: {
+      directory: './db/migrations'
+    },
     useNullAsDefault: true
   },
   staging: {
@@ -18,6 +21,9 @@ module.exports = {
     pool: {
       min: 2,
       max: 10
+    },
+    migrations: {
+      directory: './db/migrations'
     }
   },
   production: {
@@ -30,6 +36,9 @@ module.exports = {
     pool: {
       min: 2,
       max: 10
+    },
+    migrations: {
+      directory: './db/migrations'
     }
   }
 };

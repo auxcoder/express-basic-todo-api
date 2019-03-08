@@ -1,5 +1,5 @@
 // #region
-const app = require('../server');
+const app = require('../../server');
 const assert = require('assert');
 // .agent(app.listen()) is used when the --watch flag is used with Mocha.
 // but only when I ran that watching command as a npm script from package.json.
@@ -11,7 +11,7 @@ const todoObj = {
 };
 let testId;
 // #endregion
-// READ
+// READ all/paginate
 describe('GET /todos', () => {
   it('should get all todos records', done => {
     request
@@ -82,7 +82,7 @@ describe('PATCH /todos/<id>', () => {
       });
   });
 });
-
+// DELETE
 describe('DELETE /todos/<id>', () => {
   it('should remove a todo record', done => {
     request
@@ -95,5 +95,11 @@ describe('DELETE /todos/<id>', () => {
         if (err) return done(err);
         done();
       });
+  });
+  it('should trow a 404', done => {
+    request
+      .delete(`/api/todos/${testId}`)
+      .expect(500)
+      .end(done);
   });
 });

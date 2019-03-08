@@ -1,8 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 const apiRoutes = require('./routes');
-const validateReqBody = require('./middlewares/validateReqBody');
-const catchRoute = require('./middlewares/catchRoute');
+const validateReqBody = require('./routes/middlewares/validateReqBody');
+const catchRoute = require('./routes/middlewares/catchRoute');
+var logger = require('./utils/logger');
 
 var app = express();
 var port = process.env.PORT || 5000;
