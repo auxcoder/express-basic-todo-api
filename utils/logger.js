@@ -11,7 +11,8 @@ const baseTransportConfig = {
 
 var logger = winston.createLogger({
   exitOnError: false,
-  format: winston.format.json(),
+  format: winston.format.combine(winston.format.timestamp(), winston.format.prettyPrint()),
+  // format: winston.format.json(),
   transports: [
     new winston.transports.File(
       Object.assign({}, baseTransportConfig, {
