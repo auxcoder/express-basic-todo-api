@@ -1,0 +1,17 @@
+pre: code .
+windows:
+  - name: OCA Client
+    root: ~/Sites/node-express/
+    layout: main-vertical
+    panes:
+      - commands:
+          - npm run test
+        focus: true
+        name: 'tests'
+      - commands:
+          - git pull
+          - git status
+        name: 'git'
+      - commands:
+          - npm start
+        name: 'dev server'

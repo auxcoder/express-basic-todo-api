@@ -7,7 +7,10 @@ const catchRoute = require('./middlewares/catchRoute');
 var app = express();
 var port = process.env.PORT || 5000;
 
+// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+// parse application/json
+app.use(bodyParser.json());
 
 // catch post/put/patch without req.body attr
 app.use(validateReqBody);
@@ -27,6 +30,11 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500).json({ error: true, data: { message: err.message } });
 });
 
-app.listen(port, function() {
-  console.log('Express listening on port', port);
-});
+// check if a process is running for mocha with --watch flag
+if (!module.parent) {
+  app.listen(port, function() {
+    console.log('Express listening on port', port);
+  });
+}
+
+module.exports = app;
