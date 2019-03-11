@@ -1,9 +1,13 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
+const expressValidator = require('express-validator');
 const apiRoutes = require('./routes');
 const validateReqBody = require('./routes/middlewares/validateReqBody');
 const catchRoute = require('./routes/middlewares/catchRoute');
 var logger = require('./utils/logger');
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 var app = express();
 var port = process.env.PORT || 5000;
@@ -12,6 +16,8 @@ var port = process.env.PORT || 5000;
 app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 app.use(bodyParser.json());
+// after the body parser
+app.use(expressValidator());
 
 // catch post/put/patch without req.body attr
 app.use(validateReqBody);

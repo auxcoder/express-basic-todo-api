@@ -48,5 +48,7 @@ Another options is using Nodemon, as a npm package script:
 - [KnexJS](https://knexjs.org/)
 - [Sqlite](http://www.sqlitetutorial.net/)
 - [WinstonJS](https://github.com/winstonjs/winston)
+- [express-validator](https://github.com/express-validator/express-validator)
+- [Validator](https://github.com/chriso/validator.js)
 
 ---

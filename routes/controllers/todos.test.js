@@ -20,7 +20,7 @@ describe('GET /todos', () => {
       // .set('Accept', 'application/json')
       .expect(200)
       .expect(res => {
-        assert.equal(res.body.error, false);
+        assert.equal(res.body.errors, false);
         assert.equal(res.body.data.length > 0, true);
       })
       .end((err, res) => {
@@ -74,7 +74,7 @@ describe('PATCH /todos/<id>', () => {
       .send(Object.assign(todoObj, { completed: true }))
       .expect(200)
       .expect(res => {
-        assert.equal(res.body.error, false);
+        assert.equal(res.body.errors, false);
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -89,13 +89,14 @@ describe('DELETE /todos/<id>', () => {
       .delete(`/api/todos/${testId}`)
       .expect(200)
       .expect(res => {
-        assert.equal(res.body.error, false);
+        assert.equal(res.body.errors, false);
       })
       .end((err, res) => {
         if (err) return done(err);
         done();
       });
   });
+
   it('should trow a 404', done => {
     request
       .delete(`/api/todos/${testId}`)
