@@ -6,13 +6,12 @@ const baseTransportConfig = {
   json: true,
   maxFiles: 5,
   colorize: false,
-  handleExceptions: true
+  handleExceptions: true,
+  format: winston.format.combine(winston.format.timestamp(), winston.format.prettyPrint())
 };
 
 var logger = winston.createLogger({
   exitOnError: false,
-  format: winston.format.combine(winston.format.timestamp(), winston.format.prettyPrint()),
-  // format: winston.format.json(),
   transports: [
     new winston.transports.File(
       Object.assign({}, baseTransportConfig, {
@@ -34,7 +33,8 @@ var logger = winston.createLogger({
 if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
-      format: winston.format.simple(),
+      // format: winston.format.simple(),
+      format: winston.format.combine(winston.format.splat(), winston.format.simple()),
       level: 'debug',
       handleExceptions: true,
       json: false,
