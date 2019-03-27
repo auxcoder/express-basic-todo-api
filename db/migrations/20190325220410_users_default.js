@@ -2,14 +2,35 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.up = function(knex, Promise) {
-  return knex
-    .table('users')
-    .returning(['email'])
-    .insert(genUsers());
+  return knex.schema
+    .createTable('users', function(t) {
+      t.increments('id').primary();
+      t.string('username');
+      t.string('password').notNullable();
+      t.string('email').notNullable();
+      t.boolean('email_verified').defaultTo(false);
+      t.text('salt');
+      t.text('verification_token'); // use a jwt to verify account
+      t.timestamp('created_at', 6)
+        .notNullable()
+        .defaultTo(knex.fn.now());
+      t.timestamp('updated_at', 6)
+        .notNullable()
+        .defaultTo(knex.fn.now());
+    })
+    .then(() => {
+      return knex
+        .table('users')
+        .returning(['email'])
+        .insert(genUsers());
+    })
+    .catch(error => {
+      console.error('migration "users" failed: ', error);
+    });
 };
 
 exports.down = function(knex, Promise) {
-  return knex.table('users').del();
+  return knex.schema.dropTable('users');
 };
 
 function genUsers() {

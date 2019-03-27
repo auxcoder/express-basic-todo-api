@@ -40,7 +40,7 @@ app.use(function(err, req, res, next) {
 // check if a process is running for mocha with --watch flag
 if (!module.parent) {
   app.listen(port, function() {
-    console.log('Express listening on port', port);
+    console.log(`Express listening on port: ${port}`);
   });
 }
 
