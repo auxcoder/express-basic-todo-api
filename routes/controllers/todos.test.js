@@ -7,9 +7,9 @@ const request = require('supertest').agent(app.listen());
 var chance = require('chance').Chance();
 const todoObj = {
   title: chance.sentence({ words: 5 }),
-  completed: chance.bool({ likelihood: 30 })
+  completed: chance.bool({ likelihood: 30 }),
 };
-let testId;
+let modelId;
 // #endregion
 // READ all/paginate
 describe('GET /todos', () => {
@@ -37,7 +37,7 @@ describe('POST /todos', () => {
       .send(todoObj)
       .expect(201)
       .expect(res => {
-        testId = res.body.data.id;
+        modelId = res.body.data.id;
         // check that the source data is in the res
         Object.keys(todoObj).forEach(key => {
           assert.equal(todoObj[key], res.body.data[key]);
@@ -53,7 +53,7 @@ describe('POST /todos', () => {
 describe('GET /todos/<id>', () => {
   it('should get one record', done => {
     request
-      .get(`/api/todos/${testId}`)
+      .get(`/api/todos/${modelId}`)
       .expect(200)
       .expect(res => {
         Object.keys(todoObj).forEach(key => {
@@ -70,7 +70,7 @@ describe('GET /todos/<id>', () => {
 describe('PATCH /todos/<id>', () => {
   it('should update a todo record', done => {
     request
-      .patch(`/api/todos/${testId}`)
+      .patch(`/api/todos/${modelId}`)
       .send(Object.assign(todoObj, { completed: true }))
       .expect(200)
       .expect(res => {
@@ -86,7 +86,7 @@ describe('PATCH /todos/<id>', () => {
 describe('DELETE /todos/<id>', () => {
   it('should remove a todo record', done => {
     request
-      .delete(`/api/todos/${testId}`)
+      .delete(`/api/todos/${modelId}`)
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -99,7 +99,7 @@ describe('DELETE /todos/<id>', () => {
 
   it('should trow a 404', done => {
     request
-      .delete(`/api/todos/${testId}`)
+      .delete(`/api/todos/${modelId}`)
       .expect(500)
       .end(done);
   });

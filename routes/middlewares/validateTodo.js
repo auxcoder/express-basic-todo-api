@@ -1,5 +1,6 @@
 function validateTodo(req, res, next) {
-  req.checkBody('title', 'Title field min length should be 5').isLength({ min: 3 });
+  const minlength = 5;
+  req.checkBody('title', `Title field min length should be ${minlength}`).isLength({ min: minlength });
   req.checkBody('completed', 'Completed field should be a boolean').isBoolean();
 
   var errors = req.validationErrors();
