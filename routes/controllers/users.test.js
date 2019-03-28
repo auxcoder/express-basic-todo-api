@@ -1,21 +1,21 @@
-// #region
 const app = require('../../server');
 const assert = require('assert');
-// .agent(app.listen()) is used when the --watch flag is used with Mocha.
-// but only when I ran that watching command as a npm script from package.json.
 const request = require('supertest').agent(app.listen());
 var chance = require('chance').Chance();
-const todoObj = {
-  title: chance.sentence({ words: 5 }),
-  completed: chance.bool({ likelihood: 30 }),
+const userObj = {
+  username: `test${chance.word({ length: 4 })}`,
+  email: chance.email(),
+  password: `${chance.character({ casing: 'upper' })}${chance.word({ length: 5 })}${chance.natural({
+    min: 1,
+    max: 9,
+  })}${chance.character({ symbols: true })}`,
 };
 let modelId;
-// #endregion
 // READ all/paginate
-describe('GET /todos', () => {
-  it('should get all todos records', done => {
+describe('GET /users', () => {
+  it('should get all users records', done => {
     request
-      .get('/api/todos')
+      .get('/api/users')
       // by default
       // .set('Accept', 'application/json')
       .expect(200)
@@ -30,18 +30,15 @@ describe('GET /todos', () => {
   });
 });
 // CREATE
-describe('POST /todos', () => {
-  it('should create a new Todo', done => {
+describe('POST /users', () => {
+  it('should create a new User', done => {
     request
-      .post('/api/todos')
-      .send(todoObj)
+      .post('/api/users')
+      .send(userObj)
       .expect(201)
       .expect(res => {
         modelId = res.body.data.id;
-        // check that the source data is in the res
-        Object.keys(todoObj).forEach(key => {
-          assert.equal(todoObj[key], res.body.data[key]);
-        });
+        assert.equal(res.body.errors, false);
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -49,16 +46,15 @@ describe('POST /todos', () => {
       });
   });
 });
-// READ one
-describe('GET /todos/<id>', () => {
-  it('should get one record', done => {
+// READ
+describe('GET /users/<id>', () => {
+  it('should create a new User', done => {
     request
-      .get(`/api/todos/${modelId}`)
+      .get(`/api/users/${modelId}`)
       .expect(200)
       .expect(res => {
-        Object.keys(todoObj).forEach(key => {
-          assert.equal(todoObj[key], res.body.data[key]);
-        });
+        modelId = res.body.data.id;
+        assert.equal(res.body.errors, false);
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -67,11 +63,11 @@ describe('GET /todos/<id>', () => {
   });
 });
 // UPDATE
-describe('PATCH /todos/<id>', () => {
-  it('should update a todo record', done => {
+describe('PATCH /users/<id>', () => {
+  it('should update a user record', done => {
     request
-      .patch(`/api/todos/${modelId}`)
-      .send(Object.assign(todoObj, { completed: true }))
+      .patch(`/api/users/${modelId}`)
+      .send(Object.assign(userObj, { email: chance.email() }))
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -83,10 +79,10 @@ describe('PATCH /todos/<id>', () => {
   });
 });
 // DELETE
-describe('DELETE /todos/<id>', () => {
-  it('should remove a todo record', done => {
+describe('DELETE /users/<id>', () => {
+  it('should remove a user record', done => {
     request
-      .delete(`/api/todos/${modelId}`)
+      .delete(`/api/users/${modelId}`)
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -99,7 +95,7 @@ describe('DELETE /todos/<id>', () => {
 
   it('should trow a 404', done => {
     request
-      .delete(`/api/todos/${modelId}`)
+      .delete(`/api/users/${modelId}`)
       .expect(500)
       .end(done);
   });
