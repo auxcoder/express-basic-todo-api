@@ -21,6 +21,7 @@ router.post('/', userValidations.newUser, (req, res) => {
     // -----------------------------------------------
     email_verified: false,
     salt: salt,
+    active: true,
     verification_token: jwt.sign(
       {
         algorithm: 'HS256',
@@ -43,10 +44,10 @@ router.post('/', userValidations.newUser, (req, res) => {
 router.get('/:id([0-9]+)', (req, res) => {
   if (!req.params.id) console.error('quote ID is required');
   Users.where('id', req.params.id)
-    .fetch()
+    .fetch({ require: false })
     .then(data => {
       if (!data) {
-        res.status(404).json({ errors: true, data: {} });
+        res.status(404).json({ errors: true, message: 'User not found' });
       } else {
         res.json({ errors: false, data: data });
       }
@@ -57,7 +58,7 @@ router.get('/:id([0-9]+)', (req, res) => {
 router.patch('/:id([0-9]+)', userValidations.patchUser, (req, res) => {
   if (!req.params.id) console.error('user ID is required');
   Users.where('id', req.params.id)
-    .fetch()
+    .fetch({ require: true })
     .then(user => {
       user
         .save({
@@ -74,6 +75,14 @@ router.patch('/:id([0-9]+)', userValidations.patchUser, (req, res) => {
           });
         });
     })
+    .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+});
+// DELETE
+router.delete('/:id([0-9]+)', (req, res) => {
+  if (!req.params.id) console.error('user ID is required');
+  Users.forge('id', req.params.id)
+    .destroy({ require: true })
+    .then(() => res.json({ errors: false, message: 'User removed' }))
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
 });
 
