@@ -11,12 +11,16 @@ exports.up = function(knex, Promise) {
       t.boolean('email_verified').defaultTo(false);
       t.text('salt');
       t.text('verification_token'); // use a jwt to verify account
+      t.text('active');
       t.timestamp('created_at', 6)
         .notNullable()
         .defaultTo(knex.fn.now());
       t.timestamp('updated_at', 6)
         .notNullable()
         .defaultTo(knex.fn.now());
+      t.timestamp('deleted_at', 6)
+        .nullable()
+        .defaultTo('0000-00-00 00:00:00');
     })
     .then(() => {
       return knex
@@ -63,7 +67,7 @@ function genUsers() {
       },
       'secret'
     );
-    item.id = idx + 1;
+    item.active = true;
     return item;
   });
 }
