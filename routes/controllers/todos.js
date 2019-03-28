@@ -45,17 +45,17 @@ router.patch('/:id([0-9]+)', validateTodo, (req, res) => {
           completed: req.body.completed || todo.completed,
           updated_at: new Date().toISOString(),
         })
-        .then(() => res.json({ errors: false, data: { message: 'Todo updated' } }));
+        .then(data => res.json({ errors: false, data: data, message: 'Todo updated' }));
     })
-    .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+    .catch(err => res.status(500).json({ errors: [err.message] }));
 });
 // DELETE
 router.delete('/:id([0-9]+)', (req, res) => {
-  if (!req.params.id) console.error('quote ID is required');
+  if (!req.params.id) console.error('todo ID is required');
   Todos.where('id', req.params.id)
-    .destroy()
+    .destroy({ require: true })
     .then(data => res.json({ errors: false, data: data }))
-    .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+    .catch(err => res.status(500).json({ errors: [err.message] }));
 });
 
 module.exports = router;
