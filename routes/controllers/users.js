@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Users = require('../../db/models/users');
-const validateUser = require('../middlewares/validateUser');
+const userValidations = require('../middlewares/validateUser');
 
 // READ
 router.route('/').get((req, res) => {
@@ -12,7 +12,7 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
 });
 // CREATE
-router.post('/', validateUser, (req, res) => {
+router.post('/', userValidations.newUser, (req, res) => {
   const salt = bcrypt.genSaltSync(10);
   Users.forge({
     username: req.body.username,
@@ -50,6 +50,29 @@ router.get('/:id([0-9]+)', (req, res) => {
       } else {
         res.json({ errors: false, data: data });
       }
+    })
+    .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+});
+// UPDATE
+router.patch('/:id([0-9]+)', userValidations.patchUser, (req, res) => {
+  if (!req.params.id) console.error('user ID is required');
+  Users.where('id', req.params.id)
+    .fetch()
+    .then(user => {
+      user
+        .save({
+          username: req.body.username,
+          email: req.body.email,
+          // -----------------------------------------------
+          updated_at: new Date().toISOString(),
+        })
+        .then(data => {
+          return res.json({
+            errors: false,
+            data: data,
+            message: 'User updated',
+          });
+        });
     })
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
 });

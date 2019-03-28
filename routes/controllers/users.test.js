@@ -46,3 +46,19 @@ describe('POST /users', () => {
       });
   });
 });
+// UPDATE
+describe('PATCH /users/<id>', () => {
+  it('should update a user record', done => {
+    request
+      .patch(`/api/users/${modelId}`)
+      .send(Object.assign(userObj, { email: chance.email() }))
+      .expect(200)
+      .expect(res => {
+        assert.equal(res.body.errors, false);
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        done();
+      });
+  });
+});
