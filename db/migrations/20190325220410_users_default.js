@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const jwtSign = require('../../utils/jwtSign');
 
 exports.up = function(knex, Promise) {
   return knex.schema
@@ -54,19 +54,7 @@ function genUsers() {
   ].map((item, idx) => {
     item.salt = bcrypt.genSaltSync(2); // low rounds for tests
     item.password = bcrypt.hashSync(item.password, item.salt);
-    item.verification_token = jwt.sign(
-      {
-        algorithm: 'HS256',
-        expiresIn: 60 * 60 * 24 * 7 * 2,
-        subject: item.id,
-        payload: {
-          role: item.role,
-          name: item.username,
-          email: item.email,
-        },
-      },
-      'secret'
-    );
+    item.verification_token = jwtSign(item, 'verification', 60 * 60 * 24 * 7 * 2);
     item.active = true;
     return item;
   });

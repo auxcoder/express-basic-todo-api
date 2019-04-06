@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Users = require('../../db/models/users');
 const userValidations = require('../middlewares/validateUser');
-
+const jwtSign = require('../../utils/jwtSign');
 // READ
 router.route('/').get((req, res) => {
   Users.fetchAll()
@@ -13,6 +13,8 @@ router.route('/').get((req, res) => {
 });
 // CREATE
 router.post('/', userValidations.newUser, (req, res) => {
+  // sec * min * day * week * 2
+  const _ttl = 60 * 60 * 24 * 7 * 2; // two weeks live
   const salt = bcrypt.genSaltSync(10);
   Users.forge({
     username: req.body.username,
@@ -22,19 +24,8 @@ router.post('/', userValidations.newUser, (req, res) => {
     email_verified: false,
     salt: salt,
     active: true,
-    verification_token: jwt.sign(
-      {
-        algorithm: 'HS256',
-        expiresIn: 60 * 60 * 24 * 7 * 2,
-        subject: 'verification',
-        payload: {
-          role: null, // todo: define role
-          name: req.body.username,
-          email: req.body.email,
-        },
-      },
-      'secret'
-    ),
+    role: 0, // guess by default
+    verification_token: jwtSign(Object.assign(req.body, { role: 1, email_verified: false }), 'verification', _ttl),
   })
     .save()
     .then(data => res.status(201).json({ errors: false, data: { id: data.id } }))
