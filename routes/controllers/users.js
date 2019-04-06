@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
 const Users = require('../../db/models/users');
 const userValidations = require('../middlewares/validateUser');
 const jwtSign = require('../../utils/jwtSign');
@@ -75,6 +76,27 @@ router.delete('/:id([0-9]+)', (req, res) => {
     .destroy({ require: true })
     .then(() => res.json({ errors: false, message: 'User removed' }))
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+});
+
+// LOGIN
+router.post('/login', (req, res) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) console.log(err);
+    if (!user) {
+      return res.status(404).json({ error: true, message: info ? info.message : 'Login failed' });
+    }
+    req.login(user, { session: false }, err => {
+      if (err) res.send(err);
+      const _ttl = 60 * 60 * 24 * 7 * 2;
+      return res.json({
+        errors: false,
+        data: {
+          id: jwtSign(user, 'auth', _ttl),
+          user_id: user.id,
+        },
+      });
+    });
+  })(req, res);
 });
 
 module.exports = router;
