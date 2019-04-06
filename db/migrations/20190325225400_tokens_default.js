@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
         .defaultTo(knex.fn.now());
     })
     .then(() => {
-      return knex.select('id', 'username', 'email').from('users');
+      return knex.select('id', 'username', 'email', 'role', 'email_verified').from('users');
     })
     .then(users => {
       return knex

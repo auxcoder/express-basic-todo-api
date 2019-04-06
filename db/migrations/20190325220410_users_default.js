@@ -11,7 +11,8 @@ exports.up = function(knex, Promise) {
       t.boolean('email_verified').defaultTo(false);
       t.text('salt');
       t.text('verification_token'); // use a jwt to verify account
-      t.text('active');
+      t.boolean('active');
+      t.integer('role');
       t.timestamp('created_at', 6)
         .notNullable()
         .defaultTo(knex.fn.now());
@@ -51,7 +52,8 @@ function genUsers() {
       password: 'password',
       email_verified: false,
     },
-  ].map((item, idx) => {
+  ].map(item => {
+    item.role = 1;
     item.salt = bcrypt.genSaltSync(2); // low rounds for tests
     item.password = bcrypt.hashSync(item.password, item.salt);
     item.verification_token = jwtSign(item, 'verification', 60 * 60 * 24 * 7 * 2);
