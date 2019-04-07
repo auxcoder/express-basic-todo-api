@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwtSign = require('../../utils/jwtSign');
+const hashPassword = require('../../utils/hashPass');
 
 exports.up = function(knex, Promise) {
   return knex.schema
@@ -53,11 +54,15 @@ function genUsers() {
       email_verified: false,
     },
   ].map(item => {
-    item.role = 1;
-    item.salt = bcrypt.genSaltSync(2); // low rounds for tests
-    item.password = bcrypt.hashSync(item.password, item.salt);
-    item.verification_token = jwtSign(item, 'verification', 60 * 60 * 24 * 7 * 2);
-    item.active = true;
-    return item;
+    const itr = 2;
+    const salt = bcrypt.genSaltSync(itr); // low rounds for tests
+    return Object.assign(item, {
+      role: 1,
+      salt: salt,
+      itr: itr,
+      password: bcrypt.hashSync(item.password, salt),
+      verification_token: jwtSign(item, 'verification', 60 * 60 * 24 * 7 * 2),
+      active: true,
+    });
   });
 }

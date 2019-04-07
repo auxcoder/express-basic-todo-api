@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const passport = require('passport');
 const Users = require('../../db/models/users');
 const userValidations = require('../middlewares/validateUser');
 const jwtSign = require('../../utils/jwtSign');
+const hashPassword = require('../../utils/hashPass');
 // READ
 router.route('/').get((req, res) => {
   Users.fetchAll()
@@ -14,23 +12,25 @@ router.route('/').get((req, res) => {
 });
 // CREATE
 router.post('/', userValidations.newUser, (req, res) => {
-  // sec * min * day * week * 2
-  const _ttl = 60 * 60 * 24 * 7 * 2; // two weeks live
-  const salt = bcrypt.genSaltSync(10);
-  Users.forge({
-    username: req.body.username,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, salt),
-    // -----------------------------------------------
-    email_verified: false,
-    salt: salt,
-    active: true,
-    role: 0, // guess by default
-    verification_token: jwtSign(Object.assign(req.body, { role: 1, email_verified: false }), 'verification', _ttl),
-  })
-    .save()
-    .then(data => res.status(201).json({ errors: false, data: { id: data.id } }))
-    .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+  hashPassword(req.body.password, 10)
+    .then(data => {
+      Users.forge(
+        Object.assign({}, req.body, data, {
+          email_verified: false,
+          active: true,
+          role: 1, // guess by default
+          verification_token: jwtSign(
+            Object.assign(req.body, { role: 1, email_verified: false }),
+            'verification',
+            60 * 60 * 24 * 7 * 2 // ttl, two weeks (sec * min * day * week * 2)
+          ),
+        })
+      )
+        .save()
+        .then(data => res.status(201).json({ errors: false, data: { id: data.id } }))
+        .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
+    })
+    .catch(err => console.error(err));
 });
 // READ
 router.get('/:id([0-9]+)', (req, res) => {
