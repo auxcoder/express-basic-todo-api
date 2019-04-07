@@ -36,7 +36,10 @@ router.post('/', userValidations.newUser, (req, res) => {
 router.get('/:id([0-9]+)', (req, res) => {
   if (!req.params.id) console.error('quote ID is required');
   Users.where('id', req.params.id)
-    .fetch({ require: false })
+    .fetch({
+      require: true,
+      withRelated: ['tokens'],
+    })
     .then(data => {
       if (!data) {
         res.status(404).json({ errors: true, message: 'User not found' });
