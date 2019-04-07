@@ -11,6 +11,7 @@ exports.up = function(knex, Promise) {
       t.string('email').notNullable();
       t.boolean('email_verified').defaultTo(false);
       t.text('salt');
+      t.integer('itr');
       t.text('verification_token'); // use a jwt to verify account
       t.boolean('active');
       t.integer('role');
