@@ -78,20 +78,6 @@ describe('PATCH /users/<id>', () => {
       });
   });
 });
-// LOGIN
-describe('POST /login', () => {
-  it('should return a valid JWT', done => {
-    request
-      .post('/api/users/login')
-      .send(userObj)
-      .expect(200)
-      .expect(res => {
-        assert.equal(res.body.errors, false);
-        assert.equal(res.body.errors, false);
-      })
-      .end(done);
-  });
-});
 // DELETE
 describe('DELETE /users/<id>', () => {
   it('should remove a user record', done => {
