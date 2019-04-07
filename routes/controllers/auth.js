@@ -9,9 +9,13 @@ const hashPassword = require('../../utils/hashPass');
 router.get('/exist/:email', userValidations.existUser, (req, res) => {
   Users.findByEmail(req.params.email, {
     columns: ['email', 'email_verified'],
-  }).then(data => {
-    res.status(400).json({ errors: false, data: data });
-  });
+  })
+    .then(data => {
+      res.json({ errors: false, data: data });
+    })
+    .catch(err => {
+      res.status(404).json({ errors: [err.message], data: {} });
+    });
 });
 // REGISTER
 router.post('/register', userValidations.newUser, async (req, res) => {
