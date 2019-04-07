@@ -1,12 +1,12 @@
-var bookshelf = require('../../bookshelf');
-var BookshelfParanoia = require('bookshelf-paranoia');
-bookshelf.plugin('visibility');
-bookshelf.plugin(BookshelfParanoia, { sentinel: 'active', nullValue: '0000-00-00 00:00:00' });
-
-var Users = bookshelf.Model.extend({
+let Bookshelf = require('./bookshelf');
+require('./tokens');
+var Users = Bookshelf.Model.extend({
   tableName: 'users',
   hidden: ['salt', 'verification_token'],
   softDelete: true,
+  tokens: function() {
+    return this.hasMany('Tokens');
+  },
 });
-
-module.exports = Users;
+// module
+module.exports = Bookshelf.model('Users', Users);

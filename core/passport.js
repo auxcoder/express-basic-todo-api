@@ -12,7 +12,10 @@ passport.use(
     },
     function(email, password, done) {
       return Users.where('email', email)
-        .fetch({ require: true, columns: ['id', 'email_verified', 'username', 'email', 'role', 'password'] })
+        .fetch({
+          require: true,
+          columns: ['id', 'email_verified', 'username', 'email', 'role', 'password'],
+        })
         .then(model => {
           if (!model) return done(null, false, { message: 'User not found.' });
           if (!bcrypt.compareSync(password, model.get('password'))) {
