@@ -1,5 +1,10 @@
-var bookshelf = require('../../bookshelf');
-var Todos = bookshelf.Model.extend({
-  tableName: 'todos'
+const Bookshelf = require('./bookshelf');
+require('./users');
+const Todos = Bookshelf.Model.extend({
+  tableName: 'todos',
+  user: function() {
+    return this.belongsTo('Users');
+  },
 });
-module.exports = Todos;
+// module
+module.exports = Bookshelf.model('Todos', Todos);

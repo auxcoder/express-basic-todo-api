@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const jwtSign = require('../../utils/jwtSign');
-const hashPassword = require('../../utils/hashPass');
 
 exports.up = function(knex, Promise) {
   return knex.schema

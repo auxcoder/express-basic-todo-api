@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-
 function jwtSign(user, sub, ttl) {
   return jwt.sign(
     {
@@ -12,5 +11,5 @@ function jwtSign(user, sub, ttl) {
     { algorithm: 'HS256', expiresIn: ttl, subject: sub }
   );
 }
-
+// module
 module.exports = jwtSign;
