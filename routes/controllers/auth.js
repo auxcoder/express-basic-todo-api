@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const Users = require('../../db/models/users');
 const userValidations = require('../middlewares/validateUser');
+const jwtSign = require('../../utils/jwtSign');
 const buildUserAttrs = require('../../utils/buildUserAtts');
 const hashPassword = require('../../utils/hashPass');
 // READ exist
@@ -44,7 +45,7 @@ router.post('/login', (req, res) => {
   passport.authenticate('local', { session: false }, (err, user) => {
     if (err) console.log(err);
     if (!user) {
-      return res.status(404).json({ error: ['User not found'], data: {} });
+      res.status(404).json({ error: ['User not found'], data: {} });
     }
     const _ttl = req.body.ttl || 60 * 60 * 24 * 7 * 2;
     req.login(user, { session: false }, err => {
