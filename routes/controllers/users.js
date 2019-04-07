@@ -4,7 +4,7 @@ const Users = require('../../db/models/users');
 const userValidations = require('../middlewares/validateUser');
 const jwtSign = require('../../utils/jwtSign');
 const hashPassword = require('../../utils/hashPass');
-// READ
+// READ all
 router.route('/').get((req, res) => {
   Users.fetchAll()
     .then(data => res.json({ errors: false, data: data }))
@@ -14,8 +14,15 @@ router.route('/').get((req, res) => {
 router.post('/', userValidations.newUser, (req, res) => {
   hashPassword(req.body.password, 10)
     .then(data => {
-      Users.forge(
-        Object.assign({}, req.body, data, {
+      const dataMerged = Object.assign(
+        {
+          email: req.body.email,
+          username: req.body.username,
+          salt: data.salt,
+          itr: data.itr,
+          password: data.hash, // todo: should db field match "hash"
+        },
+        {
           email_verified: false,
           active: true,
           role: 1, // guess by default
@@ -24,13 +31,16 @@ router.post('/', userValidations.newUser, (req, res) => {
             'verification',
             60 * 60 * 24 * 7 * 2 // ttl, two weeks (sec * min * day * week * 2)
           ),
-        })
-      )
+        }
+      );
+      Users.forge(dataMerged)
         .save()
         .then(data => res.status(201).json({ errors: false, data: { id: data.id } }))
         .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      res.status(500).json({ errors: [err.message], data: {} });
+    });
 });
 // READ
 router.get('/:id([0-9]+)', (req, res) => {
