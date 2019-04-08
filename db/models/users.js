@@ -17,7 +17,7 @@ var Users = Bookshelf.Model.extend(
      * @return {Promise(bookshelf.Model)}
      */
     findByEmail: function(email, options) {
-      options = Object.assign({ require: true }, options);
+      options = Object.assign({}, options);
       return this.forge({ email: email }).fetch(options);
     },
   }
