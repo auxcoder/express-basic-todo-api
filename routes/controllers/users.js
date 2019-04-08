@@ -5,7 +5,7 @@ const userValidations = require('../middlewares/validateUser');
 const jwtSign = require('../../utils/jwtSign');
 const hashPassword = require('../../utils/hashPass');
 // READ all
-router.route('/').get((req, res) => {
+router.get('/', (req, res) => {
   Users.fetchAll()
     .then(data => res.json({ errors: false, data: data }))
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
