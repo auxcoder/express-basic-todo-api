@@ -9,6 +9,7 @@ const hashPassword = require('../../utils/hashPass');
 // READ exist
 router.get('/exist/:email', userValidations.existUser, (req, res) => {
   Users.findByEmail(req.params.email, {
+    require: true,
     columns: ['email', 'email_verified'],
   })
     .then(data => {
@@ -20,25 +21,29 @@ router.get('/exist/:email', userValidations.existUser, (req, res) => {
 });
 // REGISTER
 router.post('/register', userValidations.newUser, async (req, res) => {
-  try {
-    Users.findByEmail(req.body.email, {
-      columns: ['id', 'email', 'email_verified'],
-    }).then(model => {
+  Users.findByEmail(req.body.email, {
+    columns: ['id', 'email', 'email_verified'],
+  })
+    .then(model => {
+      if (!model) {
+        return hashPassword(req.body.password, 10);
+      }
+
       // response with errors, user exist &|| not verified
       const messages = [`Email in use: ${model.get('email')}`];
       if (!model.get('email_verified')) messages.push(`Email not veryfied: ${model.get('email_verified')}`);
       res.status(400).json({ errors: messages, data: {} });
+    })
+    .then(data => {
+      const dataMerged = buildUserAttrs(req.body, data);
+      return Users.forge(dataMerged).save();
+    })
+    .then(model => {
+      res.status(201).json({ errors: false, data: { id: model.id } });
+    })
+    .catch(err => {
+      res.json({ errors: [err.message], data: { id: model.id } });
     });
-
-    // create new user
-    const data = await hashPassword(req.body.password, 10);
-    const dataMerged = buildUserAttrs(req.body, data);
-    const newUser = await Users.forge(dataMerged).save();
-    res.status(201).json({ errors: false, data: { id: newUser.id } });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ errors: [err.message], data: {} });
-  }
 });
 // LOGIN
 router.post('/login', (req, res) => {
