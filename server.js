@@ -21,11 +21,10 @@ app.use(bodyParser.json());
 // after the body parser
 app.use(expressValidator());
 
-// catch post/put/patch without req.body attr
+// validate post/put/patch req.body
 app.use(validateReqBody);
-
+// api routes
 app.use('/api', apiRoutes);
-
 // catch 404 and forward to error handler
 app.use(catchRoute);
 
