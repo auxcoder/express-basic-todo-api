@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const Users = require('../../db/models/users');
+const Tokens = require('../../db/models/tokens');
 const userValidations = require('../middlewares/validateUser');
+const validateAuth = require('../middlewares/validateAuth');
 const jwtSign = require('../../utils/jwtSign');
 const buildUserAttrs = require('../../utils/buildUserAtts');
 const hashPassword = require('../../utils/hashPass');
@@ -64,6 +66,23 @@ router.post('/login', (req, res) => {
         });
     });
   })(req, res);
+});
+// LOGOUT
+router.get('/logout', validateAuth.hasAuthToken, (req, res) => {
+  const token = req.headers.authorization.replace(/bearer\s+/, '');
+  Tokens.forge({ id: token })
+    .destroy({ required: true })
+    .then(() => {
+      // Model#destroy() resolves to empty model
+      res.json({ errors: false, data: {} });
+    })
+    .catch(err => {
+      if (err.message === 'No Rows Deleted') {
+        res.status(404).json({ errors: [err.message], data: {} });
+      } else {
+        res.json({ errors: [err], data: {} });
+      }
+    });
 });
 // module
 module.exports = router;

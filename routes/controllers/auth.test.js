@@ -13,21 +13,13 @@ const userObj = {
   })}${chance.character({ symbols: true })}`,
 };
 let userId;
+let bearerToken;
 const testUser = {
   email: 'kiubmen@gmail.com',
   username: 'kiubmen',
   password: 'password',
+  ttl: 86400,
 };
-const token = jwtSign(
-  {
-    name: testUser.username,
-    email: testUser.email,
-    role: 1,
-    vrf: testUser.email_verified,
-  },
-  'auth',
-  60 * 60
-);
 // REGISTER
 describe('POST /register', () => {
   it('should register a new user', done => {
@@ -55,7 +47,7 @@ describe('POST /login', () => {
     };
     request
       .post('/api/auth/login')
-      .send(user)
+      .send({ email: testUser.email, password: testUser.password, ttl: 86400 })
       .expect(201)
       .expect(res => {
         bearerToken = res.body.data.id;
@@ -63,7 +55,7 @@ describe('POST /login', () => {
         assert(typeof res.body.data.id == 'string');
         jwt.verify(res.body.data.id, 'secret', function(err, decoded) {
           assert(!err);
-          assert.equal(decoded.email, user.email);
+          assert.equal(decoded.email, testUser.email);
           assert.equal(decoded.sub, 'auth');
         });
       })
@@ -89,5 +81,21 @@ describe('GET /auth/exist/<email>', () => {
   });
   it('should have status 400, email not found', done => {
     request.get(`/api/auth/exist/xxx@gmail.com`).expect(404, done);
+  });
+});
+describe('GET /auth/logout', () => {
+  it('should have status 200 and token deleted', done => {
+    console.log(bearerToken);
+    request
+      .get(`/api/auth/logout`)
+      .set('Authorization', `bearer ${bearerToken}`)
+      .expect(200)
+      .expect(res => {
+        assert.equal(res.body.errors, false);
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        done();
+      });
   });
 });
