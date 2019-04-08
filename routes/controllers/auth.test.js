@@ -1,6 +1,7 @@
 const app = require('../../server');
 const assert = require('assert');
 const jwt = require('jsonwebtoken');
+const jwtSign = require('../../utils/jwtSign');
 var chance = require('chance').Chance();
 const request = require('supertest').agent(app.listen());
 const userObj = {
@@ -12,6 +13,21 @@ const userObj = {
   })}${chance.character({ symbols: true })}`,
 };
 let userId;
+const testUser = {
+  email: 'kiubmen@gmail.com',
+  username: 'kiubmen',
+  password: 'password',
+};
+const token = jwtSign(
+  {
+    name: testUser.username,
+    email: testUser.email,
+    role: 1,
+    vrf: testUser.email_verified,
+  },
+  'auth',
+  60 * 60
+);
 // REGISTER
 describe('POST /register', () => {
   it('should register a new user', done => {
@@ -40,8 +56,9 @@ describe('POST /login', () => {
     request
       .post('/api/auth/login')
       .send(user)
-      .expect(200)
+      .expect(201)
       .expect(res => {
+        bearerToken = res.body.data.id;
         assert.equal(res.body.errors, false);
         assert(typeof res.body.data.id == 'string');
         jwt.verify(res.body.data.id, 'secret', function(err, decoded) {

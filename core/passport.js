@@ -38,7 +38,6 @@ passport.use(
       secretOrKey: 'secret',
     },
     function(jwtPayload, done) {
-      // console.log(`jwtPayload > ${JSON.stringify(jwtPayload)}`);
       return Users.findByEmail(jwtPayload.email, {
         require: true,
         columns: ['email_verified', 'username', 'email', 'role'],

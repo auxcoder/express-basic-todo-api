@@ -28,15 +28,13 @@ router.post('/register', userValidations.newUser, async (req, res) => {
       if (!model) {
         return hashPassword(req.body.password, 10);
       }
-
       // response with errors, user exist &|| not verified
       const messages = [`Email in use: ${model.get('email')}`];
       if (!model.get('email_verified')) messages.push(`Email not veryfied: ${model.get('email_verified')}`);
       res.status(400).json({ errors: messages, data: {} });
     })
     .then(data => {
-      const dataMerged = buildUserAttrs(req.body, data);
-      return Users.forge(dataMerged).save();
+      return Users.forge(buildUserAttrs(req.body, data)).save();
     })
     .then(model => {
       res.status(201).json({ errors: false, data: { id: model.id } });
@@ -55,13 +53,15 @@ router.post('/login', (req, res) => {
     const _ttl = req.body.ttl || 60 * 60 * 24 * 7 * 2;
     req.login(user, { session: false }, err => {
       if (err) res.send(err);
-      return res.json({
-        errors: false,
-        data: {
-          id: jwtSign(user, 'auth', _ttl),
-          user_id: user.id,
-        },
-      });
+      const token = jwtSign(user, 'auth', _ttl);
+      Tokens.forge({ id: token, user_id: user.id })
+        .save(null, { method: 'insert' })
+        .then(model => {
+          res.status(201).json({ errors: false, data: model });
+        })
+        .catch(err => {
+          res.status(500).json({ errors: [err.message], data: {} });
+        });
     });
   })(req, res);
 });
