@@ -6,6 +6,9 @@ const Tokens = require('../../db/models/tokens');
 const userValidations = require('../middlewares/validateUser');
 const validateAuth = require('../middlewares/validateAuth');
 const jwtSign = require('../../utils/jwtSign');
+const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+const verifyAsync = promisify(jwt.verify);
 const buildUserAttrs = require('../../utils/buildUserAtts');
 const hashPassword = require('../../utils/hashPass');
 // READ exist
@@ -42,7 +45,7 @@ router.post('/register', userValidations.newUser, async (req, res) => {
       res.status(201).json({ errors: false, data: { id: model.id } });
     })
     .catch(err => {
-      res.json({ errors: [err.message], data: { id: model.id } });
+      res.json({ errors: [err.message], data: {} });
     });
 });
 // LOGIN
@@ -82,6 +85,24 @@ router.get('/logout', validateAuth.hasAuthToken, (req, res) => {
       } else {
         res.json({ errors: [err], data: {} });
       }
+    });
+});
+// VERIFY
+router.post('/verify', validateAuth.verifyEmail, (req, res) => {
+  const verifyToken = req.body.token;
+  verifyAsync(verifyToken, 'secret')
+    .then(decoded => {
+      return Users.findByEmail(decoded.email, { required: true });
+    })
+    .then(model => {
+      model.set({ email_verified: true });
+      return model.save();
+    })
+    .then(model => {
+      res.json({ errors: false, data: model });
+    })
+    .catch(err => {
+      res.json({ errors: [err.message], data: {} });
     });
 });
 // module
