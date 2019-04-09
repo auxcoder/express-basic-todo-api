@@ -29,3 +29,11 @@ module.exports.patchUser = function patchUser(req, res, next) {
   if (errors) ifErrors(errors, res);
   return next();
 };
+
+module.exports.existUser = function existUser(req, res, next) {
+  req.checkParams('email', `Email field not valid`).isEmail();
+
+  var errors = req.validationErrors();
+  if (errors) ifErrors(errors, res);
+  return next();
+};

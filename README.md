@@ -40,11 +40,18 @@ Another options is using Nodemon, as a npm package script:
 
 ---
 
+## JWT
+
+[JSON Web Token Claims](https://www.iana.org/assignments/jwt/jwt.xhtml)
+
+---
+
 ### Ref
 
 #### Docs
 
 - [BookshelfJS](https://bookshelfjs.org/api.html)
+- [BookshelfJS 'registry' plugin](https://github.com)
 - [KnexJS](https://knexjs.org/)
 - [Sqlite](http://www.sqlitetutorial.net/)
 - [WinstonJS](https://github.com/winstonjs/winston)
@@ -52,3 +59,7 @@ Another options is using Nodemon, as a npm package script:
 - [Validator](https://github.com/chriso/validator.js)
 
 ---
+
+<!---
+https://github.com/strongloop/loopback
+--->

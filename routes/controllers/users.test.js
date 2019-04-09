@@ -1,8 +1,9 @@
 const app = require('../../server');
 const assert = require('assert');
+const jwtSign = require('../../utils/jwtSign');
 const request = require('supertest').agent(app.listen());
 var chance = require('chance').Chance();
-const userObj = {
+const newUser = {
   username: `test${chance.word({ length: 4 })}`,
   email: chance.email(),
   password: `${chance.character({ casing: 'upper' })}${chance.word({ length: 5 })}${chance.natural({
@@ -10,14 +11,30 @@ const userObj = {
     max: 9,
   })}${chance.character({ symbols: true })}`,
 };
+const testUser = {
+  email: 'kiubmen@gmail.com',
+  username: 'kiubmen',
+  password: 'password',
+};
 let modelId;
+const token = jwtSign(
+  {
+    name: testUser.username,
+    email: testUser.email,
+    role: 1,
+    vrf: testUser.email_verified,
+  },
+  'auth',
+  60 * 60
+);
+
 // READ all/paginate
 describe('GET /users', () => {
   it('should get all users records', done => {
     request
       .get('/api/users')
-      // by default
-      // .set('Accept', 'application/json')
+      // .set('Accept', 'application/json') // by default
+      .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -34,7 +51,8 @@ describe('POST /users', () => {
   it('should create a new User', done => {
     request
       .post('/api/users')
-      .send(userObj)
+      .set('Authorization', `bearer ${token}`)
+      .send(newUser)
       .expect(201)
       .expect(res => {
         modelId = res.body.data.id;
@@ -48,9 +66,10 @@ describe('POST /users', () => {
 });
 // READ
 describe('GET /users/<id>', () => {
-  it('should create a new User', done => {
+  it('should get a User by id', done => {
     request
       .get(`/api/users/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect(res => {
         modelId = res.body.data.id;
@@ -67,7 +86,8 @@ describe('PATCH /users/<id>', () => {
   it('should update a user record', done => {
     request
       .patch(`/api/users/${modelId}`)
-      .send(Object.assign(userObj, { email: chance.email() }))
+      .set('Authorization', `bearer ${token}`)
+      .send(Object.assign(newUser, { email: chance.email() }))
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -83,6 +103,7 @@ describe('DELETE /users/<id>', () => {
   it('should remove a user record', done => {
     request
       .delete(`/api/users/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -96,6 +117,7 @@ describe('DELETE /users/<id>', () => {
   it('should trow a 404', done => {
     request
       .delete(`/api/users/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(500)
       .end(done);
   });
