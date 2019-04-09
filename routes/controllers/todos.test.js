@@ -1,6 +1,7 @@
 // #region
 const app = require('../../server');
 const assert = require('assert');
+const jwtSign = require('../../utils/jwtSign');
 // .agent(app.listen()) is used when the --watch flag is used with Mocha.
 // but only when I ran that watching command as a npm script from package.json.
 const request = require('supertest').agent(app.listen());
@@ -10,6 +11,21 @@ const todoObj = {
   completed: chance.bool({ likelihood: 30 }),
 };
 let modelId;
+const testUser = {
+  email: 'kiubmen@gmail.com',
+  username: 'kiubmen',
+  password: 'password',
+};
+const token = jwtSign(
+  {
+    name: testUser.username,
+    email: testUser.email,
+    role: 1,
+    vrf: testUser.email_verified,
+  },
+  'auth',
+  60 * 60
+);
 // #endregion
 // READ all/paginate
 describe('GET /todos', () => {
@@ -18,6 +34,7 @@ describe('GET /todos', () => {
       .get('/api/todos')
       // by default
       // .set('Accept', 'application/json')
+      .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -35,6 +52,7 @@ describe('POST /todos', () => {
     request
       .post('/api/todos')
       .send(todoObj)
+      .set('Authorization', `bearer ${token}`)
       .expect(201)
       .expect(res => {
         modelId = res.body.data.id;
@@ -54,6 +72,7 @@ describe('GET /todos/<id>', () => {
   it('should get one record', done => {
     request
       .get(`/api/todos/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect(res => {
         Object.keys(todoObj).forEach(key => {
@@ -71,6 +90,7 @@ describe('PATCH /todos/<id>', () => {
   it('should update a todo record', done => {
     request
       .patch(`/api/todos/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .send(Object.assign(todoObj, { completed: true }))
       .expect(200)
       .expect(res => {
@@ -87,6 +107,7 @@ describe('DELETE /todos/<id>', () => {
   it('should remove a todo record', done => {
     request
       .delete(`/api/todos/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect(res => {
         assert.equal(res.body.errors, false);
@@ -100,6 +121,7 @@ describe('DELETE /todos/<id>', () => {
   it('should trow a 404', done => {
     request
       .delete(`/api/todos/${modelId}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(500)
       .end(done);
   });

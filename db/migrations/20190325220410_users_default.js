@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const jwtSign = require('../../utils/jwtSign');
 
 exports.up = function(knex, Promise) {
   return knex.schema
@@ -10,8 +10,10 @@ exports.up = function(knex, Promise) {
       t.string('email').notNullable();
       t.boolean('email_verified').defaultTo(false);
       t.text('salt');
+      t.integer('itr');
       t.text('verification_token'); // use a jwt to verify account
-      t.text('active');
+      t.boolean('active');
+      t.integer('role');
       t.timestamp('created_at', 6)
         .notNullable()
         .defaultTo(knex.fn.now());
@@ -51,23 +53,16 @@ function genUsers() {
       password: 'password',
       email_verified: false,
     },
-  ].map((item, idx) => {
-    item.salt = bcrypt.genSaltSync(2); // low rounds for tests
-    item.password = bcrypt.hashSync(item.password, item.salt);
-    item.verification_token = jwt.sign(
-      {
-        algorithm: 'HS256',
-        expiresIn: 60 * 60 * 24 * 7 * 2,
-        subject: item.id,
-        payload: {
-          role: item.role,
-          name: item.username,
-          email: item.email,
-        },
-      },
-      'secret'
-    );
-    item.active = true;
-    return item;
+  ].map(item => {
+    const itr = 2;
+    const salt = bcrypt.genSaltSync(itr); // low rounds for tests
+    return Object.assign(item, {
+      role: 1,
+      salt: salt,
+      itr: itr,
+      password: bcrypt.hashSync(item.password, salt),
+      verification_token: jwtSign(item, 'verification', 60 * 60 * 24 * 7 * 2),
+      active: true,
+    });
   });
 }

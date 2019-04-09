@@ -4,7 +4,7 @@ const Todos = require('../../db/models/todos');
 const validateTodo = require('../middlewares/validateTodo');
 
 // READ
-router.route('/').get((req, res) => {
+router.get('/', (req, res) => {
   Todos.fetchAll()
     .then(data => res.json({ errors: false, data: data }))
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));

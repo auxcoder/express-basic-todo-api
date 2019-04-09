@@ -1,10 +1,10 @@
 const Bookshelf = require('../bookshelf');
 require('./users');
-const Todos = Bookshelf.Model.extend({
-  tableName: 'todos',
+const Tokens = Bookshelf.Model.extend({
+  tableName: 'tokens',
   user: function() {
     return this.belongsTo('Users');
   },
 });
 // module
-module.exports = Bookshelf.model('Todos', Todos);
+module.exports = Bookshelf.model('Tokens', Tokens);

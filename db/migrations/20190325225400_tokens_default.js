@@ -1,17 +1,21 @@
-const jwt = require('jsonwebtoken');
+const jwtSign = require('../../utils/jwtSign');
 
 exports.up = function(knex, Promise) {
   return knex.schema
     .createTable('tokens', function(t) {
       t.text('id').primary();
-      t.integer('ttl');
-      t.integer('user_id');
+      t.integer('user_id')
+        .unsigned()
+        .notNullable();
       t.timestamp('created_at', 6)
         .notNullable()
         .defaultTo(knex.fn.now());
+      t.foreign('user_id')
+        .references('id')
+        .inTable('users');
     })
     .then(() => {
-      return knex.select('id', 'username', 'email').from('users');
+      return knex.select('id', 'username', 'email', 'role', 'email_verified').from('users');
     })
     .then(users => {
       return knex
@@ -29,21 +33,10 @@ exports.down = function(knex, Promise) {
 };
 
 function genToken(users) {
+  const _ttl = 60 * 60 * 24 * 7 * 2;
   return users.map(user => {
     return {
-      id: jwt.sign(
-        {
-          algorithm: 'HS256',
-          expiresIn: 60 * 60 * 24 * 7 * 2,
-          subject: user.id,
-          payload: {
-            username: user.username,
-            email: user.email,
-          },
-        },
-        'secret'
-      ),
-      ttl: 60 * 60 * 24 * 7 * 2,
+      id: jwtSign(user, 'auth', _ttl),
       user_id: user.id,
     };
   });

@@ -5,6 +5,8 @@ const apiRoutes = require('./routes');
 const validateReqBody = require('./routes/middlewares/validateReqBody');
 const catchRoute = require('./routes/middlewares/catchRoute');
 var logger = require('./utils/logger');
+require('./core/passport');
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -19,11 +21,10 @@ app.use(bodyParser.json());
 // after the body parser
 app.use(expressValidator());
 
-// catch post/put/patch without req.body attr
+// validate post/put/patch req.body
 app.use(validateReqBody);
-
+// api routes
 app.use('/api', apiRoutes);
-
 // catch 404 and forward to error handler
 app.use(catchRoute);
 
