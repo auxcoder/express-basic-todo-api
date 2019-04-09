@@ -85,8 +85,11 @@ router.patch('/:id([0-9]+)', userValidations.patchUser, (req, res) => {
 // DELETE
 router.delete('/:id([0-9]+)', (req, res) => {
   if (!req.params.id) console.error('user ID is required');
+  let options = { require: true };
+  // hard remove test record if env is dev
+  if (process.env.NODE_ENV === 'test') options.hardDelete = true;
   Users.forge('id', req.params.id)
-    .destroy({ require: true })
+    .destroy(options)
     .then(() => res.json({ errors: false, message: 'User removed' }))
     .catch(err => res.status(500).json({ errors: [err.message], data: {} }));
 });
