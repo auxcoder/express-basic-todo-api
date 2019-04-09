@@ -1,9 +1,9 @@
-let Bookshelf = require('./bookshelf');
+let Bookshelf = require('../bookshelf');
 require('./tokens');
 var Users = Bookshelf.Model.extend(
   {
     tableName: 'users',
-    hidden: ['salt', 'verification_token'],
+    hidden: ['salt'],
     softDelete: true,
     tokens: function() {
       return this.hasMany('Tokens');
