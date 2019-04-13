@@ -1,5 +1,6 @@
 const jwtSign = require('../../utils/jwtSign');
-
+const constants = require('../../config/constants');
+// modules
 exports.up = function(knex, Promise) {
   return knex.schema
     .createTable('tokens', function(t) {
@@ -33,10 +34,9 @@ exports.down = function(knex, Promise) {
 };
 
 function genToken(users) {
-  const _ttl = 60 * 60 * 24 * 7 * 2;
   return users.map(user => {
     return {
-      id: jwtSign(user, 'auth', _ttl),
+      id: jwtSign(user, 'auth', constants.ttlAuth),
       user_id: user.id,
     };
   });

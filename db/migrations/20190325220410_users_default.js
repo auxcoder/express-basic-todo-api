@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwtSign = require('../../utils/jwtSign');
-
+const constants = require('../../config/constants');
+// modules
 exports.up = function(knex, Promise) {
   return knex.schema
     .createTable('users', function(t) {
@@ -61,7 +62,7 @@ function genUsers() {
       salt: salt,
       itr: itr,
       password: bcrypt.hashSync(item.password, salt),
-      verification_token: jwtSign(item, 'verification', 60 * 60 * 24 * 7 * 2),
+      verification_token: jwtSign(item, 'verification', constants.ttlVerify),
       active: true,
     });
   });

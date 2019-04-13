@@ -11,6 +11,7 @@ const { promisify } = require('util');
 const verifyAsync = promisify(jwt.verify);
 const buildUserAttrs = require('../../utils/buildUserAtts');
 const hashPassword = require('../../utils/hashPass');
+const constants = require('../../config/constants');
 // READ exist
 router.get('/exist/:email', userValidations.existUser, (req, res) => {
   Users.findByEmail(req.params.email, {
@@ -55,7 +56,7 @@ router.post('/login', (req, res) => {
     if (!user) {
       res.status(404).json({ error: ['User not found'], data: {} });
     }
-    const _ttl = req.body.ttl || 60 * 60 * 24 * 7 * 2;
+    const _ttl = req.body.ttl || constants.ttlAuth;
     req.login(user, { session: false }, err => {
       if (err) res.send(err);
       const token = jwtSign(user, 'auth', _ttl);

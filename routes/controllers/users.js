@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const constants = require('../../config/constants');
 const Users = require('../../db/models/users');
 const userValidations = require('../middlewares/validateUser');
 const jwtSign = require('../../utils/jwtSign');
@@ -12,7 +13,7 @@ router.get('/', (req, res) => {
 });
 // CREATE
 router.post('/', userValidations.newUser, (req, res) => {
-  hashPassword(req.body.password, 10)
+  hashPassword(req.body.password, constants.saltRounds)
     .then(data => {
       const dataMerged = Object.assign(
         {
@@ -29,7 +30,7 @@ router.post('/', userValidations.newUser, (req, res) => {
           verification_token: jwtSign(
             Object.assign(req.body, { role: 1, email_verified: false }),
             'verification',
-            60 * 60 * 24 * 7 * 2 // ttl, two weeks (sec * min * day * week * 2)
+            constants.ttlVerify
           ),
         }
       );
