@@ -4,7 +4,7 @@ const constants = require('../config/constants');
 const buildUserAttrs = (user, data) => {
   const emailVerified = false;
   const role = 1; // guess by default
-  const userData = Object.assign(user, { role: role, email_verified: emailVerified });
+  const userData = Object.assign(user, { role: role, verified: emailVerified });
   return Object.assign(
     {
       email: user.email,
@@ -14,10 +14,10 @@ const buildUserAttrs = (user, data) => {
       password: data.hash,
     },
     {
-      email_verified: emailVerified,
+      verified: emailVerified,
       active: true,
       role: role,
-      verification_token: jwtSign(userData, 'verification', constants.ttlVerify),
+      veroken: jwtSign(userData, 'verification', constants.ttlVerify),
     }
   );
 };

@@ -16,7 +16,7 @@ exports.up = function(knex, Promise) {
         .inTable('users');
     })
     .then(() => {
-      return knex.select('id', 'username', 'email', 'role', 'email_verified').from('users');
+      return knex.select('id', 'username', 'email', 'role', 'verified').from('users');
     })
     .then(users => {
       return knex

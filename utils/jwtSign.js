@@ -5,7 +5,7 @@ function jwtSign(user, sub, ttl) {
       name: user.username,
       email: user.email,
       role: user.role,
-      vrf: user.email_verified,
+      vrf: user.verified,
     },
     'secret',
     { algorithm: 'HS256', expiresIn: ttl, subject: sub }

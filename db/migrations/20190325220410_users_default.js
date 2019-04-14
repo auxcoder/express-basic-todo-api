@@ -9,11 +9,11 @@ exports.up = function(knex, Promise) {
       t.string('username');
       t.string('password').notNullable();
       t.string('email').notNullable();
-      t.boolean('email_verified').defaultTo(false);
+      t.boolean('verified').defaultTo(false);
       t.text('salt');
       t.integer('itr');
-      t.text('verification_token'); // use a jwt to verify account
-      t.boolean('active');
+      t.text('veroken'); // use a jwt to verify account
+      t.boolean('active').defaultTo(false);
       t.integer('role');
       t.timestamp('created_at', 6)
         .notNullable()
@@ -46,13 +46,13 @@ function genUsers() {
       email: 'kiubmen@gmail.com',
       username: 'kiubmen',
       password: 'password',
-      email_verified: true,
+      verified: true,
     },
     {
       email: 'testera@auxcoder.com',
       username: 'testera',
       password: 'password',
-      email_verified: false,
+      verified: false,
     },
   ].map(item => {
     const itr = 2;
@@ -62,7 +62,7 @@ function genUsers() {
       salt: salt,
       itr: itr,
       password: bcrypt.hashSync(item.password, salt),
-      verification_token: jwtSign(item, 'verification', constants.ttlVerify),
+      veroken: jwtSign(item, 'verification', constants.ttlVerify),
       active: true,
     });
   });
