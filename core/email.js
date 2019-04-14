@@ -1,24 +1,28 @@
 const postmark = require('postmark');
 const constants = require('../config/constants');
-let env = process.env.NODE_ENV || 'development';
 const client = new postmark.Client(constants.postmarkId);
-//
-async function mock() {}
-const emailRepository = {
-  /**
-   * https://postmarkapp.com/developer/api/email-api
-   * https://postmarkapp.com/developer/api/overview
-   */
-  successSchema: function() {
-    return {
-      To: null, // <email@domain>
-      SubmittedAt: null, // <timestampz>
-      MessageID: null, // <uuid>
-      ErrorCode: 0, //
-      Message: 'OK', //
-    };
-  },
+async function mock() {
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(
+      () =>
+        resolve({
+          To: null, // <email@domain>
+          SubmittedAt: null, // <timestampz>
+          MessageID: null, // <uuid>
+          ErrorCode: 0, //
+          Message: 'OK', //
+        }),
+      1000
+    );
+  });
+  return await promise;
+}
 
+/**
+ * https://postmarkapp.com/developer/api/email-api
+ * https://postmarkapp.com/developer/api/overview
+ */
+const emailRepository = {
   /**
    * Send an email using a template aliase name and passing a data object
    * @param {String} from
@@ -27,13 +31,15 @@ const emailRepository = {
    * @returns A promise that's resolved with the sent email
    */
   sendWelcome: async function sendWelcome(from, to, templateModel = {}) {
-    if (env === 'test') return await mock();
-    return await client.sendEmailWithTemplate({
+    if (constants.env === 'test') return await mock();
+    const resolvedData = await client.sendEmailWithTemplate({
       From: from,
       To: to,
       TemplateAlias: 'welcome',
       TemplateModel: templateModel,
     });
+    console.debug(resolvedData);
+    return resolvedData;
   },
 
   /**
@@ -54,7 +60,7 @@ const emailRepository = {
     templateId = null,
     template = {}
   ) {
-    if (env === 'test') return await mock();
+    if (constants.env === 'test') return await mock();
     const email = {
       From: from,
       To: to,
@@ -64,7 +70,9 @@ const emailRepository = {
       TemplateModel: template,
     };
     if (!email.TemplateId) delete email.TemplateModel;
-    return await client.sendEmail(email);
+    const resolvedData = await client.sendEmail(email);
+    console.debug(resolvedData);
+    return resolvedData;
   },
 };
 // module
