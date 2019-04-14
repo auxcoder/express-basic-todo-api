@@ -46,6 +46,11 @@ Another options is using Nodemon, as a npm package script:
 
 ---
 
+## Logs
+
+Logs gets writen to file from level `debug` and up in the `all-logs.log` files under **/logs** dir. Errors get logged too into `errors.log` files.
+Related logic in `/core/logger`, using **[Winston](https://github.com/winstonjs/winston)**.
+
 ### Ref
 
 #### Docs
