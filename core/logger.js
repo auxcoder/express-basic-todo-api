@@ -3,11 +3,10 @@
 var winston = require('winston');
 
 const baseTransportConfig = {
-  json: true,
   maxFiles: 5,
   colorize: false,
   handleExceptions: true,
-  format: winston.format.combine(winston.format.timestamp(), winston.format.prettyPrint())
+  format: winston.format.combine(winston.format.timestamp(), winston.format.prettyPrint()),
 };
 
 var logger = winston.createLogger({
@@ -15,19 +14,21 @@ var logger = winston.createLogger({
   transports: [
     new winston.transports.File(
       Object.assign({}, baseTransportConfig, {
+        json: true,
         maxsize: 5242880, //5MB,
         level: 'error',
-        filename: './logs/error.log'
+        filename: './logs/error-logs.log',
       })
     ),
     new winston.transports.File(
       Object.assign({}, baseTransportConfig, {
+        json: false,
         maxsize: 5242880, //5MB
         level: 'debug',
-        filename: './logs/all-logs.log'
+        filename: './logs/all-logs.log',
       })
-    )
-  ]
+    ),
+  ],
 });
 
 if (process.env.NODE_ENV !== 'production') {
@@ -38,7 +39,7 @@ if (process.env.NODE_ENV !== 'production') {
       level: 'debug',
       handleExceptions: true,
       json: false,
-      colorize: true
+      colorize: true,
     })
   );
 }

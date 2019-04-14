@@ -4,7 +4,7 @@ const expressValidator = require('express-validator');
 const apiRoutes = require('./routes');
 const validateReqBody = require('./routes/middlewares/validateReqBody');
 const catchRoute = require('./routes/middlewares/catchRoute');
-var logger = require('./utils/logger');
+require('./core/logger');
 require('./core/passport');
 
 if (process.env.NODE_ENV !== 'production') {
