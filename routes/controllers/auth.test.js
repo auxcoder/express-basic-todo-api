@@ -24,7 +24,16 @@ describe('POST /register', () => {
   it('should register a new user', done => {
     request
       .post('/api/auth/register')
-      .send(newObj)
+      .send(
+        Object.assign(newObj, {
+          client: {
+            host: 'http://localhost:3000',
+            action_url: '/verify',
+            login_url: '/login',
+            help_url: '/help',
+          },
+        })
+      )
       .expect(201)
       .expect(res => {
         userId = res.body.data.id;

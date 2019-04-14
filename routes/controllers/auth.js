@@ -11,6 +11,9 @@ const { promisify } = require('util');
 const verifyAsync = promisify(jwt.verify);
 const buildUserAttrs = require('../../utils/buildUserAtts');
 const hashPassword = require('../../utils/hashPass');
+const buildTemplateModel = require('../../utils/buildTemplateModel');
+const emailRepository = require('../../core/email');
+const constants = require('../../config/constants');
 // READ exist
 router.get('/exist/:email', userValidations.existUser, (req, res) => {
   Users.findByEmail(req.params.email, {
@@ -26,27 +29,31 @@ router.get('/exist/:email', userValidations.existUser, (req, res) => {
 });
 // REGISTER
 router.post('/register', userValidations.newUser, async (req, res) => {
-  Users.findByEmail(req.body.email, {
-    columns: ['id', 'email', 'email_verified'],
-  })
-    .then(model => {
-      if (!model) {
-        return hashPassword(req.body.password, 10);
-      }
-      // response with errors, user exist &|| not verified
-      const messages = [`Email in use: ${model.get('email')}`];
-      if (!model.get('email_verified')) messages.push(`Email not veryfied: ${model.get('email_verified')}`);
-      res.status(400).json({ errors: messages, data: {} });
-    })
-    .then(data => {
-      return Users.forge(buildUserAttrs(req.body, data)).save();
-    })
-    .then(model => {
-      res.status(201).json({ errors: false, data: { id: model.id } });
-    })
-    .catch(err => {
-      res.json({ errors: [err.message], data: {} });
+  try {
+    let newUserId;
+    const user = await Users.findByEmail(req.body.email, {
+      // required: true,
+      columns: ['id', 'email', 'email_verified'],
     });
+
+    if (user) {
+      const messages = [`Email in use: ${user.get('email')}`];
+      if (!user.get('email_verified')) messages.push(`Email not veryfied: ${user.get('email_verified')}`);
+      return res.status(400).json({ errors: messages, data: {} });
+    }
+    // response with errors, user exist &|| not verified
+    const hash = await hashPassword(req.body.password, constants.saltRounds);
+    const model = await Users.forge(buildUserAttrs(req.body, hash)).save();
+    newUserId = model.get('id');
+    const welcomeEmail = await emailRepository.sendWelcome(
+      'noreplay@auxcoder.com',
+      model.get('email'),
+      buildTemplateModel(model.toJSON(), req.body.client)
+    );
+    res.status(201).json({ errors: false, data: { id: newUserId } });
+  } catch (error) {
+    res.json({ errors: [error.message], data: {} });
+  }
 });
 // LOGIN
 router.post('/login', (req, res) => {
@@ -55,7 +62,7 @@ router.post('/login', (req, res) => {
     if (!user) {
       res.status(404).json({ error: ['User not found'], data: {} });
     }
-    const _ttl = req.body.ttl || 60 * 60 * 24 * 7 * 2;
+    const _ttl = req.body.ttl || constants.ttlAuth;
     req.login(user, { session: false }, err => {
       if (err) res.send(err);
       const token = jwtSign(user, 'auth', _ttl);
