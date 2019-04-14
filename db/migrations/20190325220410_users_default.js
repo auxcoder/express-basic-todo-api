@@ -12,7 +12,7 @@ exports.up = function(knex, Promise) {
       t.boolean('verified').defaultTo(false);
       t.text('salt');
       t.integer('itr');
-      t.text('verification_token'); // use a jwt to verify account
+      t.text('veroken'); // use a jwt to verify account
       t.boolean('active').defaultTo(false);
       t.integer('role');
       t.timestamp('created_at', 6)
@@ -62,7 +62,7 @@ function genUsers() {
       salt: salt,
       itr: itr,
       password: bcrypt.hashSync(item.password, salt),
-      verification_token: jwtSign(item, 'verification', constants.ttlVerify),
+      veroken: jwtSign(item, 'verification', constants.ttlVerify),
       active: true,
     });
   });

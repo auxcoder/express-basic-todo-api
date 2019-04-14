@@ -17,7 +17,7 @@ const buildUserAttrs = (user, data) => {
       verified: emailVerified,
       active: true,
       role: role,
-      verification_token: jwtSign(userData, 'verification', constants.ttlVerify),
+      veroken: jwtSign(userData, 'verification', constants.ttlVerify),
     }
   );
 };

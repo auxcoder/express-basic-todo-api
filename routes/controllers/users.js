@@ -27,7 +27,7 @@ router.post('/', userValidations.newUser, (req, res) => {
           verified: false,
           active: true,
           role: 1, // guess by default
-          verification_token: jwtSign(
+          veroken: jwtSign(
             Object.assign(req.body, { role: 1, email_verified: false }),
             'verification',
             constants.ttlVerify

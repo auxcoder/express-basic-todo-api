@@ -96,7 +96,7 @@ describe('GET /auth/verify', () => {
       .set('Authorization', `bearer ${bearerToken}`)
       .expect(200)
       .expect(res => {
-        verificationToken = res.body.data.verification_token;
+        verificationToken = res.body.data.veroken;
       })
       .end(function(err, res) {
         if (err) done(err);
