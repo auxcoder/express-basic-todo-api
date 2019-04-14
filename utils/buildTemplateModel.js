@@ -6,7 +6,7 @@ function buildTemplateModel(user, client) {
     name: user.username,
     username: user.email,
     product_url: client.host,
-    action_url: `${client.host}${client.action_url}/${user.verification_token}`,
+    action_url: `${client.host}${client.action_url}/${user.veroken}`,
     login_url: `${client.host}${client.login_url}`,
     support_email: constants.supportEmail,
     sender_name: 'Support Team',
