@@ -16,10 +16,6 @@ $ npm install
 $ npm start
 ```
 
-## Running the application
-
-[PM2](https://github.com/Unitech/PM2/)
-
 ---
 
 ## Running tests
@@ -58,13 +54,9 @@ Related logic in `/core/logger`, using **[Winston](https://github.com/winstonjs/
 - [BookshelfJS](https://bookshelfjs.org/api.html)
 - [BookshelfJS 'registry' plugin](https://github.com)
 - [KnexJS](https://knexjs.org/)
-- [Sqlite](http://www.sqlitetutorial.net/)
+- [SQLite](http://www.sqlitetutorial.net/)
 - [WinstonJS](https://github.com/winstonjs/winston)
 - [express-validator](https://github.com/express-validator/express-validator)
 - [Validator](https://github.com/chriso/validator.js)
 
 ---
-
-<!---
-https://github.com/strongloop/loopback
---->
