@@ -21,7 +21,7 @@ const token = jwtSign(
     name: testUser.username,
     email: testUser.email,
     role: 1,
-    vrf: testUser.email_verified,
+    vrf: testUser.verified,
   },
   'auth',
   60 * 60

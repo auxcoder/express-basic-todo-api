@@ -18,7 +18,7 @@ const constants = require('../../config/constants');
 router.get('/exist/:email', userValidations.existUser, (req, res) => {
   Users.findByEmail(req.params.email, {
     require: true,
-    columns: ['email', 'email_verified'],
+    columns: ['email', 'verified'],
   })
     .then(data => {
       res.json({ errors: false, data: data });
@@ -33,15 +33,15 @@ router.post('/register', userValidations.newUser, async (req, res) => {
     let newUserId;
     const user = await Users.findByEmail(req.body.email, {
       // required: true,
-      columns: ['id', 'email', 'email_verified'],
+      columns: ['id', 'email', 'verified'],
     });
 
     if (user) {
       const messages = [`Email in use: ${user.get('email')}`];
-      if (!user.get('email_verified')) messages.push(`Email not veryfied: ${user.get('email_verified')}`);
+      if (!user.get('verified')) messages.push(`Email not veryfied: ${user.get('verified')}`);
+      // response with errors, user exist &|| not verified
       return res.status(400).json({ errors: messages, data: {} });
     }
-    // response with errors, user exist &|| not verified
     const hash = await hashPassword(req.body.password, constants.saltRounds);
     const model = await Users.forge(buildUserAttrs(req.body, hash)).save();
     newUserId = model.get('id');
@@ -102,7 +102,7 @@ router.post('/verify', validateAuth.verifyEmail, (req, res) => {
       return Users.findByEmail(decoded.email, { required: true });
     })
     .then(model => {
-      model.set({ email_verified: true });
+      model.set({ verified: true });
       return model.save();
     })
     .then(model => {

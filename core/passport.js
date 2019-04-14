@@ -16,7 +16,7 @@ passport.use(
       return Users.where('email', email)
         .fetch({
           require: true,
-          columns: ['id', 'email_verified', 'username', 'email', 'role', 'password'],
+          columns: ['id', 'verified', 'username', 'email', 'role', 'password'],
         })
         .then(model => {
           if (!model) return done(null, false, { message: 'User not found.' });
@@ -40,7 +40,7 @@ passport.use(
     function(jwtPayload, done) {
       return Users.findByEmail(jwtPayload.email, {
         require: true,
-        columns: ['email_verified', 'username', 'email', 'role'],
+        columns: ['verified', 'username', 'email', 'role'],
       })
         .then(model => {
           if (model.get('email') === jwtPayload.email && jwtPayload.sub === 'auth') {

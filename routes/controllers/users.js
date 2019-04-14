@@ -24,7 +24,7 @@ router.post('/', userValidations.newUser, (req, res) => {
           password: data.hash, // todo: should db field match "hash"
         },
         {
-          email_verified: false,
+          verified: false,
           active: true,
           role: 1, // guess by default
           verification_token: jwtSign(
